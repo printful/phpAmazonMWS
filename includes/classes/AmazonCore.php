@@ -106,15 +106,12 @@ abstract class AmazonCore{
     protected $logpath;
     protected $env;
     protected $rawResponses = array();
-    
+
     /**
      * AmazonCore constructor sets up key information used in all Amazon requests.
-     * 
+     *
      * This constructor is called when initializing all objects in this library.
      * The parameters are passed by the child objects' constructors.
-     * @param string $s [optional] <p>Name for the store you want to use as seen in the config file.
-     * If there is only one store defined in the config file, this parameter is not necessary.
-     * If there is more than one store and this is not set to a valid name, none of these objects will work.</p>
      * @param boolean $mock [optional] <p>This is a flag for enabling Mock Mode.
      * When this is set to <b>TRUE</b>, the object will fetch responses from
      * files you specify instead of sending the requests to Amazon.
@@ -124,13 +121,15 @@ abstract class AmazonCore{
      * When Mock Mode is enabled, the object will retrieve one of these files
      * from the list to use as a response. See <i>setMock</i> for more information.</p>
      * @param string $config [optional] <p>An alternate config file to set. Used for testing.</p>
+     * @internal param string $s [optional] <p>Name for the store you want to use as seen in the config file.
+     * If there is only one store defined in the config file, this parameter is not necessary.
+     * If there is more than one store and this is not set to a valid name, none of these objects will work.</p>
      */
-    protected function __construct($s = null, $mock = false, $m = null, $config = null){
+    protected function __construct($mock = false, $m = null, $config = null){
         if (is_null($config)){
             $config = __DIR__.'/../../amazon-config.php';
         }
         $this->setConfig($config);
-        $this->setStore($s);
         $this->setMock($mock,$m);
         
         $this->env=__DIR__.'/../../environment.php';
