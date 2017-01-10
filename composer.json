@@ -13,5 +13,6 @@
                    },
     "autoload": {
         "classmap": ["includes/classes/"]
-    }
+    },
+    "minimum-stability": "stable"
 }
