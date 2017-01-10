@@ -107,6 +107,8 @@ abstract class AmazonCore{
     protected $env;
     protected $rawResponses = array();
 
+    protected $configArray = [];
+
     /**
      * AmazonCore constructor sets up key information used in all Amazon requests.
      *
@@ -127,7 +129,7 @@ abstract class AmazonCore{
      */
     protected function __construct($mock = false, $m = null, $config = null){
         if (is_null($config)){
-            $config = __DIR__.'/../../amazon-config.php';
+            $config = __DIR__.'/../../amazon-config.default.php';
         }
         $this->setConfigFile($config);
         $this->setMock($mock,$m);
@@ -355,16 +357,15 @@ abstract class AmazonCore{
      * @param string $path <p>The path to the config file.</p>
      * @throws Exception If the file cannot be found or read.
      */
-    public function setConfigFile($path){
-        if (file_exists($path) && is_readable($path)){
-            include($path);
-            $this->config = $path;
-            $this->setLogPath($logpath);
-            if (isset($AMAZON_SERVICE_URL)) {
-                $this->urlbase = rtrim($AMAZON_SERVICE_URL, '/') . '/';
-            }
-        } else {
-            throw new Exception("Config file does not exist or cannot be read! ($path)");
+    public function setConfigFile($path)
+    {
+        if (!file_exists($path) || !is_readable($path)) {
+            throw new Exception("Config file does not exist or cannot be read: ($path)!");
+        }
+        include($path);
+        $this->config = $path;
+        if (isset($AMAZON_SERVICE_URL)) {
+            $this->urlbase = rtrim($AMAZON_SERVICE_URL, '/') . '/';
         }
     }
 
@@ -376,12 +377,15 @@ abstract class AmazonCore{
      * @param string $path <p>The path to the log file.</p>
      * @throws Exception If the file cannot be found or read.
      */
-    public function setLogPath($path){
-        if (file_exists($path) && is_readable($path)){
-            $this->logpath = $path;
-        } else {
-            throw new Exception("Log file does not exist or cannot be read! ($path)");
+    public function setLogPath($path)
+    {
+        if (!$path) {
+            return;
         }
+        if (!file_exists($path) || !is_readable($path)) {
+            throw new Exception("Log file does not exist or cannot be read: ($path)!");
+        }
+        $this->logpath = $path;
 
     }
 
@@ -440,12 +444,16 @@ abstract class AmazonCore{
         if (!array_key_exists('secretKey', $config)) {
             $this->log("Secret Key is missing!", 'Warning');
         }
+        $this->options['secretKey'] = $config['secretKey'];
+        $this->options['marketplaceId'] = $config['marketplaceId'];
         if (!empty($config['serviceUrl'])) {
             $this->urlbase = $config['serviceUrl'];
         }
         if (!empty($config['MWSAuthToken'])) {
             $this->options['MWSAuthToken'] = $config['MWSAuthToken'];
         }
+
+        $this->configArray = $config;
     }
 
     /**

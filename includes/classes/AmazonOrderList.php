@@ -47,8 +47,7 @@ class AmazonOrderList extends AmazonOrderCore implements Iterator{
     public function __construct($mock = false, $m = null, $config = null){
         parent::__construct($mock, $m, $config);
         include($this->env);
-        $this->resetMarketplaceFilter();
-        
+
         if(isset($THROTTLE_LIMIT_ORDERLIST)) {
             $this->throttleLimit = $THROTTLE_LIMIT_ORDERLIST;
         }
@@ -56,6 +55,13 @@ class AmazonOrderList extends AmazonOrderCore implements Iterator{
             $this->throttleTime = $THROTTLE_TIME_ORDERLIST;
         }
         $this->throttleGroup = 'ListOrders';
+    }
+
+    public function setConfigArray($config)
+    {
+        parent::setConfigArray($config);
+
+        $this->setMarketplaceFilter($this->options['marketplaceId']);
     }
     
     /**
@@ -187,6 +193,7 @@ class AmazonOrderList extends AmazonOrderCore implements Iterator{
      * @return boolean <b>FALSE</b> if improper input
      */
     public function setMarketplaceFilter($list){
+        $this->resetMarketplaceFilter();
         if (is_string($list)){
             //if single string, set as filter
             $this->resetMarketplaceFilter();
@@ -216,18 +223,6 @@ class AmazonOrderList extends AmazonOrderCore implements Iterator{
             if(preg_match("#MarketplaceId#",$op)){
                 unset($this->options[$op]);
             }
-        }
-
-        //reset to store's default marketplace
-        if (file_exists($this->config)){
-            include($this->config);
-        } else {
-            throw new Exception('Config file does not exist!');
-        }
-        if(isset($store[$this->storeName]) && array_key_exists('marketplaceId', $store[$this->storeName])){
-            $this->options['MarketplaceId.Id.1'] = $store[$this->storeName]['marketplaceId'];
-        } else {
-            $this->log("Marketplace ID is missing",'Urgent');
         }
     }
     
@@ -494,10 +489,15 @@ class AmazonOrderList extends AmazonOrderCore implements Iterator{
             if ($key != 'Order'){
                 break;
             }
-            $this->orderList[$this->index] = new AmazonOrder(null, $data, $this->mockMode, $this->mockFiles,
-                $this->config);
-            $this->orderList[$this->index]->setLogPath($this->logpath);
-            $this->orderList[$this->index]->mockIndex = $this->mockIndex;
+
+            $amazonOrder = new AmazonOrder(null, $data, $this->mockMode, $this->mockFiles, $this->config);
+
+            $amazonOrder->setConfigArray($this->configArray);
+            $amazonOrder->setLogPath($this->logpath);
+            $amazonOrder->mockIndex = $this->mockIndex;
+
+            $this->orderList[$this->index] = $amazonOrder;
+
             $this->index++;
         }
         
