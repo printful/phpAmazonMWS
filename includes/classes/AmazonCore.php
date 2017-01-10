@@ -481,6 +481,9 @@ abstract class AmazonCore{
      * @throws Exception If the file can't be written to.
      */
     protected function log($msg, $level = 'Info'){
+        if (!$this->logpath) {
+            return;
+        }
         if ($msg != false) {
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
