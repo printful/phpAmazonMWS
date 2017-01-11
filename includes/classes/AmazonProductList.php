@@ -39,7 +39,7 @@ class AmazonProductList extends AmazonProductsCore implements Iterator{
      * @param array|string $m [optional] <p>The files (or file) to use in Mock Mode.</p>
      * @param string $config [optional] <p>An alternate config file to set. Used for testing.</p>
      */
-    public function __construct($s = null, $mock = false, $m = null, $config = null){
+    public function __construct($mock = false, $m = null, $config = null){
         parent::__construct($mock, $m, $config);
         include($this->env);
         

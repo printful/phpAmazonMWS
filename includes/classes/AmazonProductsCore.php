@@ -54,14 +54,7 @@ abstract class AmazonProductsCore extends AmazonCore{
             $this->urlbranch = 'Products/'.$AMAZON_VERSION_PRODUCTS;
             $this->options['Version'] = $AMAZON_VERSION_PRODUCTS;
         }
-        
-        //set the store's marketplace as the default
-        if(isset($store[$this->storeName]) && array_key_exists('marketplaceId', $store[$this->storeName])){
-            $this->setMarketplace($store[$this->storeName]['marketplaceId']);
-        } else {
-            $this->log("Marketplace ID is missing",'Urgent');
-        }
-        
+
         if(isset($THROTTLE_LIMIT_PRODUCT)) {
             $this->throttleLimit = $THROTTLE_LIMIT_PRODUCT;
         }
@@ -80,6 +73,13 @@ abstract class AmazonProductsCore extends AmazonCore{
         } else {
             return false;
         }
+    }
+
+    public function setConfigArray($config)
+    {
+        parent::setConfigArray($config);
+
+        $this->setMarketplace($config['marketplaceId']);
     }
     
     /**
