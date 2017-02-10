@@ -357,6 +357,11 @@ abstract class AmazonCore{
         }
     }
 
+    public function getLastErrorXml()
+    {
+        return $this->lastErrorXml;
+    }
+
     /**
      * Set the config file.
      *
