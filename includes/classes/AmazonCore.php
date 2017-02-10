@@ -109,6 +109,8 @@ abstract class AmazonCore{
 
     protected $configArray = [];
 
+    protected $lastErrorXml = null;
+
     /**
      * AmazonCore constructor sets up key information used in all Amazon requests.
      *
@@ -137,6 +139,11 @@ abstract class AmazonCore{
         $this->env=__DIR__.'/../../environment.php';
         $this->options['SignatureVersion'] = 2;
         $this->options['SignatureMethod'] = 'HmacSHA256';
+    }
+
+    public function getFullRequestUrl()
+    {
+        return $this->urlbase . $this->urlbranch;
     }
 
     /**
@@ -340,9 +347,11 @@ abstract class AmazonCore{
             return false;
         }
         if ($r['code'] == 200){
+            $this->lastErrorXml = null;
             return true;
         } else {
             $xml = simplexml_load_string($r['body'])->Error;
+            $this->lastErrorXml = $xml;
             $this->log("Bad Response! ".$r['code']." ".$r['error'].": ".$xml->Code." - ".$xml->Message,'Urgent');
             return false;
         }
